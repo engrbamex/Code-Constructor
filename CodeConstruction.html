@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Constructor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Press+Start+2P&display=swap');
+
+        :root {
+            --space-blue: #0A192F;
+            --brick-red: #E74C3C;
+            --brick-blue: #3498DB;
+            --brick-green: #2ECC71;
+            --brick-yellow: #F1C40F;
+            --text-color: #E6E6E6;
+            --button-bg: #34495E;
+            --button-hover: #4A6C96;
+            --correct-color: #27AE60;
+            --wrong-color: #C0392B;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--space-blue);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Starry Background Effect */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: #000 url('https://www.transparenttextures.com/patterns/stardust.png');
+            animation: move-stars 100s linear infinite;
+        }
+
+        @keyframes move-stars {
+            from { background-position: 0 0; }
+            to { background-position: 10000px 5000px; }
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(10, 25, 47, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 2px solid var(--text-color);
+        }
+        
+        #game-header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 2.5rem;
+            color: var(--brick-yellow);
+            text-shadow: 4px 4px 0 #000;
+        }
+
+        #score-summary {
+            font-size: 1.2rem;
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: 2px dashed var(--text-color);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .game-content {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .quiz-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .build-panel {
+            flex: 1;
+            min-height: 400px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 2px dashed var(--text-color);
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        #question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        #end-summary {
+            text-align: left;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .summary-item {
+            margin-bottom: 15px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .summary-question {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+
+        .summary-answer {
+            font-size: 0.9rem;
+            color: var(--correct-color);
+        }
+        .summary-wrong {
+            color: var(--wrong-color);
+        }
+
+        #timer-display {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--brick-green);
+            transition: color 0.5s;
+        }
+
+        #timer-display.low-time {
+            color: var(--wrong-color);
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .option-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: 3px solid var(--text-color);
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 0 var(--text-color);
+        }
+
+        .option-button:hover {
+            transform: translateY(-2px);
+            background-color: var(--button-hover);
+            box-shadow: 0 7px 0 var(--text-color);
+        }
+
+        .option-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 var(--text-color);
+        }
+
+        /* Styles for showing correct/wrong answers */
+        .correct {
+            background-color: var(--correct-color);
+            color: white;
+            animation: pulse-correct 0.5s ease-out;
+        }
+
+        .wrong {
+            background-color: var(--wrong-color);
+            color: white;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes pulse-correct {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .brick {
+            width: 100px;
+            height: 50px;
+            margin: 2px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        #build-structure {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column-reverse; /* Bricks stack from the bottom up */
+            align-items: center;
+        }
+
+        .falling {
+            opacity: 0;
+            transform: translate(-50%, 500px) rotate(45deg);
+        }
+
+        #message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 25, 47, 0.9);
+            border: 3px solid var(--text-color);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            font-family: 'Press Start 2P', cursive;
+            animation: fade-in 0.3s ease-out;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .message-content {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .message-button {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--brick-yellow);
+            color: var(--space-blue);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 0 #A18536;
+        }
+
+        .message-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 #A18536;
+        }
+        .message-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #A18536;
+        }
+        
+        .start-button {
+            margin-top: 20px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .game-content { flex-direction: column; }
+            .quiz-panel, .build-panel { min-height: 200px; }
+            #question-text { font-size: 1rem; }
+            .option-button { font-size: 0.8rem; padding: 12px 20px; }
+            .brick { width: 80px; height: 40px; }
+            .brick-placeholder { width: 80px; height: 40px; }
+            #score-summary { flex-direction: column; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="game-container">
+        <div id="game-header">
+            <h1>Code Constructor</h1>
+            <div id="score-summary" style="display: none;">
+                <span id="question-counter">Question 0 of 20</span>
+                <span id="score-display">Bricks Built: 0</span>
+            </div>
+        </div>
+        <div class="game-content">
+            <div class="quiz-panel">
+                <p id="question-text">Welcome, Builder! Get ready to construct your rocket.</p>
+                <div id="timer-display">40</div>
+                <div id="options-container">
+                    <!-- Answer buttons will be dynamically added here -->
+                </div>
+                <button class="message-button start-button" id="start-button">Start Building!</button>
+            </div>
+            <div class="build-panel">
+                <div id="build-structure">
+                    <!-- Bricks will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="message-box">
+        <div class="message-content"></div>
+        <button class="message-button" onclick="hideMessage()">OK</button>
+    </div>
+
+    <script>
+        // Game configuration and state
+        const allQuestions = [
+            { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"], correctAnswer: "Hyper Text Markup Language" },
+            { question: "Which tag is used for a large heading?", options: ["<head>", "<h1>", "<title>"], correctAnswer: "<h1>" },
+            { question: "What does CSS stand for?", options: ["Creative Style Sheets", "Cascading Style Sheets", "Computer Style Sheets"], correctAnswer: "Cascading Style Sheets" },
+            { question: "Which property changes text color?", options: ["font-color", "text-color", "color"], correctAnswer: "color" },
+            { question: "How do you select an ID in CSS?", options: [".myId", "#myId", "myId"], correctAnswer: "#myId" },
+            { question: "Which tag is a paragraph?", options: ["<p>", "<paragraph>", "<para>"], correctAnswer: "<p>" },
+            { question: "What is the tag for an ordered list?", options: ["<ul>", "<ol>", "<li>"], correctAnswer: "<ol>" },
+            { question: "Which property changes background color?", options: ["background-color", "bg-color", "color-background"], correctAnswer: "background-color" },
+            { question: "How to add an HTML comment?", options: ["// comment", "<!-- comment -->", "# comment"], correctAnswer: "<!-- comment -->" },
+            { question: "How to add a CSS comment?", options: ["// comment", "/* comment */", "<!-- comment -->"], correctAnswer: "/* comment */" },
+            { question: "What HTML element is for an image?", options: ["<image>", "<img>", "<picture>"], correctAnswer: "<img>" },
+            { question: "Which CSS property is for element spacing?", options: ["spacing", "margin", "padding"], correctAnswer: "margin" },
+            { question: "What tag is for a button?", options: ["<button>", "<btn>", "<click>"], correctAnswer: "<button>" },
+            { question: "How to use an external stylesheet?", options: ["<link rel='stylesheet' href='...'>", "<style src='...'>", "<css href='...'>"], correctAnswer: "<link rel='stylesheet' href='...'>" },
+            { question: "Which property makes text bold?", options: ["font-weight: bold", "text-style: bold", "bold: true"], correctAnswer: "font-weight: bold" },
+            { question: "How to declare a variable in JavaScript?", options: ["variable x;", "var x;", "v x;"], correctAnswer: "var x;" },
+            { question: "Which CSS unit is relative to the viewport width?", options: ["em", "px", "vw"], correctAnswer: "vw" },
+            { question: "What is the correct tag for a line break?", options: ["<break>", "<lb>", "<br>"], correctAnswer: "<br>" },
+            { question: "How to create a JavaScript function?", options: ["function name()", "function:name()", "def name()"], correctAnswer: "function name()" },
+            { question: "What is the HTML tag for a table?", options: ["<table>", "<tab>", "<grid>"], correctAnswer: "<table>" },
+            { question: "What HTML element defines a division or a section in an HTML document?", options: ["<span>", "<section>", "<div>"], correctAnswer: "<div>" },
+            { question: "Which HTML tag is used to embed a video?", options: ["<media>", "<video>", "<movie>"], correctAnswer: "<video>" },
+            { question: "Which HTML tag is used for a horizontal rule?", options: ["<line>", "<hr>", "<break>"], correctAnswer: "<hr>" },
+            { question: "What attribute specifies an image's URL?", options: ["link", "src", "href"], correctAnswer: "src" },
+            { question: "Which tag is used to define the document's type?", options: ["<html>", "<!DOCTYPE html>", "<doctype>"], correctAnswer: "<!DOCTYPE html>" },
+            { question: "Which tag creates a hyperlink?", options: ["<a>", "<link>", "<url>"], correctAnswer: "<a>" },
+            { question: "Which HTML element is used to specify a footer for a document or section?", options: ["<footer>", "<bottom>", "<end>"], correctAnswer: "<footer>" },
+            { question: "Which CSS property controls the spacing between lines of text?", options: ["text-spacing", "line-height", "line-spacing"], correctAnswer: "line-height" },
+            { question: "How do you specify a background image in CSS?", options: ["background-img", "image-background", "background-image"], correctAnswer: "background-image" },
+            { question: "Which HTML tag is used for an unordered list?", options: ["<ol>", "<list>", "<ul>"], correctAnswer: "<ul>" },
+            { question: "Which tag defines the title of a document?", options: ["<head>", "<title>", "<body>"], correctAnswer: "<title>" },
+            { question: "Which CSS property is used to make text italic?", options: ["text-style: italic", "font-style: italic", "italic: true"], correctAnswer: "font-style: italic" },
+            { question: "What is the correct HTML element for inserting a line break?", options: ["<lb>", "<br>", "<break>"], correctAnswer: "<br>" },
+            { question: "Which CSS property adds shadows to text?", options: ["font-shadow", "text-shadow", "shadow-text"], correctAnswer: "text-shadow" },
+            { question: "Which HTML element is used to define important text?", options: ["<i>", "<strong>", "<bold>"], correctAnswer: "<strong>" },
+            { question: "What CSS property would you use to change the font of an element?", options: ["font-family", "text-font", "font-type"], correctAnswer: "font-family" },
+            { question: "Which HTML attribute specifies an alternate text for an image?", options: ["title", "alt", "description"], correctAnswer: "alt" },
+            { question: "What is the primary purpose of the `<head>` tag in HTML?", options: ["To define the main content", "To contain metadata and links to external files", "To display headings"], correctAnswer: "To contain metadata and links to external files" },
+            { question: "Which CSS property is used to create rounded corners?", options: ["border-radius", "corner-round", "round-border"], correctAnswer: "border-radius" },
+            { question: "What is the correct HTML for adding a background color?", options: ["<body bgcolor='yellow'>", "<body style='background-color:yellow;'>", "<background>yellow</background>"], correctAnswer: "<body style='background-color:yellow;'>" },
+            { question: "Which HTML element is used for an input field?", options: ["<field>", "<input>", "<form>"], correctAnswer: "<input>" },
+            { question: "How do you select elements with class 'header' in CSS?", options: ["#header", ".header", "header"], correctAnswer: ".header" },
+            { question: "Which HTML tag is used to define an internal stylesheet?", options: ["<css>", "<script>", "<style>"], correctAnswer: "<style>" },
+            { question: "Which CSS property controls the order of flexible items?", options: ["align-items", "flex-order", "order"], correctAnswer: "order" },
+            { question: "What does the `href` attribute specify in an `<a>` tag?", options: ["The text to display", "The destination URL", "The style of the link"], correctAnswer: "The destination URL" },
+            { question: "Which HTML element is used to group related elements in a form?", options: ["<group>", "<fieldset>", "<section>"], correctAnswer: "<fieldset>" },
+            { question: "Which CSS pseudo-class selects an element that is being hovered over?", options: [":active", ":focus", ":hover"], correctAnswer: ":hover" },
+            { question: "What is the correct HTML for a checkbox?", options: ["<input type='check'>", "<input type='checkbox'>", "<checkbox>"], correctAnswer: "<input type='checkbox'>" },
+            { question: "Which CSS property is used to control the transparency of an element?", options: ["visible", "opacity", "transparent"], correctAnswer: "opacity" },
+            { question: "Which HTML tag is used for a table row?", options: ["<td>", "<th>", "<tr>"], correctAnswer: "<tr>" },
+            { question: "Which CSS property is used to set the text alignment?", options: ["align-text", "text-align", "text-position"], correctAnswer: "text-align" },
+            { question: "What is the HTML tag for a button?", options: ["<btn>", "<button>", "<click>"], correctAnswer: "<button>" },
+            { question: "Which HTML element is used to provide a caption for a `<table>`?", options: ["<caption>", "<title>", "<figcaption>"], correctAnswer: "<caption>" },
+            { question: "Which CSS property is used to make text uppercase?", options: ["text-transform: uppercase", "font-case: upper", "text-uppercase: true"], correctAnswer: "text-transform: uppercase" },
+            { question: "What does `<img>` stand for?", options: ["important image", "image element", "image source"], correctAnswer: "image element" },
+            { question: "Which HTML attribute specifies the width of an image?", options: ["size", "width", "imgwidth"], correctAnswer: "width" },
+            { question: "Which CSS property defines the space between cells in a table?", options: ["cell-spacing", "border-spacing", "table-gap"], correctAnswer: "border-spacing" },
+            { question: "What is the correct HTML tag for subscript text?", options: ["<sub>", "<subscript>", "<script>"], correctAnswer: "<sub>" },
+            { question: "Which CSS property allows you to define different styles for different media types/devices?", options: ["@media", "media-style", "device-style"], correctAnswer: "@media" },
+            { question: "Which HTML element is used to mark a short quotation?", options: ["<blockquote>", "<q>", "<quote>"], correctAnswer: "<q>" },
+            { question: "Which CSS property is used to add shadows to box elements?", options: ["box-shadow", "element-shadow", "shadow"], correctAnswer: "box-shadow" },
+            { question: "What HTML tag creates a text area for multi-line input?", options: ["<input type='textarea'>", "<textarea>", "<textbox>"], correctAnswer: "<textarea>" },
+            { question: "Which CSS property is used to specify the type of cursor to be displayed?", options: ["mouse-pointer", "cursor", "pointer-type"], correctAnswer: "cursor" },
+            { question: "What is the HTML tag for a division?", options: ["<section>", "<div>", "<group>"], correctAnswer: "<div>" },
+            { question: "Which HTML attribute specifies the URL of the linked document?", options: ["src", "link", "href"], correctAnswer: "href" },
+            { question: "Which CSS property is used to define the thickness of a border?", options: ["border-width", "border-size", "line-thickness"], correctAnswer: "border-width" },
+            { question: "What is the correct HTML for an email input field?", options: ["<input type='email'>", "<input type='mail'>", "<email>"], correctAnswer: "<input type='email'>" },
+            { question: "Which CSS property sets the background color of an element?", options: ["color-background", "background-color", "bgcolor"], correctAnswer: "background-color" },
+            { question: "What is the HTML tag for defining a list item?", options: ["<item>", "<li-item>", "<li>"], correctAnswer: "<li>" },
+            { question: "Which HTML element is used to embed audio content?", options: ["<sound>", "<audio>", "<music>"], correctAnswer: "<audio>" },
+            { question: "Which CSS property is used to specify a flexible container?", options: ["display: block", "display: flex", "display: inline"], correctAnswer: "display: flex" },
+            { question: "What HTML tag is used to create a definition list?", options: ["<dl>", "<listdef>", "<dlist>"], correctAnswer: "<dl>" },
+            { question: "Which CSS property controls the space between letters?", options: ["letter-spacing", "character-spacing", "font-spacing"], correctAnswer: "letter-spacing" },
+            { question: "What HTML element defines a table header?", options: ["<td>", "<th>", "<tr>"], correctAnswer: "<th>" },
+            { question: "Which HTML attribute makes an input field required?", options: ["must", "required", "mandatory"], correctAnswer: "required" },
+            { question: "Which CSS property is used to hide an element?", options: ["display: none", "visibility: hidden", "hide: true"], correctAnswer: "display: none" },
+            { question: "What is the HTML tag for a hyperlink?", options: ["<link>", "<href>", "<a>"], correctAnswer: "<a>" },
+            { question: "Which HTML element defines preformatted text?", options: ["<p>", "<pre>", "<format>"], correctAnswer: "<pre>" },
+            { question: "Which CSS property is used to set the font size?", options: ["text-size", "font-size", "size"], correctAnswer: "font-size" },
+            { question: "What is the HTML tag for a span element?", options: ["<div>", "<p>", "<span>"], correctAnswer: "<span>" },
+            { question: "Which HTML attribute specifies a unique ID for an element?", options: ["class", "name", "id"], correctAnswer: "id" },
+            { question: "Which CSS property applies a blur effect to an element?", options: ["filter: blur()", "blur-effect", "blur()"], correctAnswer: "filter: blur()" },
+            { question: "What is the HTML tag for emphasizing text?", options: ["<b>", "<em>", "<i>"], correctAnswer: "<em>" },
+            { question: "Which CSS property controls the indentation of the first line of text?", options: ["text-indent", "first-line", "indent"], correctAnswer: "text-indent" },
+            { question: "What HTML tag is used to define the body of an HTML document?", options: ["<head>", "<body>", "<html>"], correctAnswer: "<body>" },
+            { question: "Which HTML attribute specifies a class name for an element?", options: ["id", "tag", "class"], correctAnswer: "class" },
+            { question: "Which CSS property is used to create a gradient background?", options: ["background-color", "background-gradient", "linear-gradient()"], correctAnswer: "linear-gradient()" },
+            { question: "What is the HTML tag for a script?", options: ["<js>", "<script>", "<javascript>"], correctAnswer: "<script>" },
+            { question: "Which HTML element defines a navigation link?", options: ["<nav>", "<link>", "<menu>"], correctAnswer: "<nav>" },
+            { question: "Which CSS property is used to change the color of an element's border?", options: ["border-style", "border-color", "border-fill"], correctAnswer: "border-color" },
+            { question: "What HTML tag is used for a checkbox input?", options: ["<input type='check'>", "<input type='checkbox'>", "<checkbox>"], correctAnswer: "<input type='checkbox'>" },
+            { question: "Which HTML attribute specifies the number of columns a table cell should span?", options: ["colspan", "rowspan", "span"], correctAnswer: "colspan" },
+            { question: "Which CSS property is used to make text uppercase?", options: ["text-transform: uppercase", "font-case: upper", "text-uppercase: true"], correctAnswer: "text-transform: uppercase" },
+            { question: "What is the HTML tag for an ordered list item?", options: ["<item>", "<ol_item>", "<li>"], correctAnswer: "<li>" },
+            { question: "Which HTML element is used to insert a graphic or image?", options: ["<pic>", "<img>", "<figure>"], correctAnswer: "<img>" },
+            { question: "Which CSS property defines the style of the border?", options: ["border-style", "border-type", "line-style"], correctAnswer: "border-style" },
+            { question: "What is the HTML tag for a horizontal rule?", options: ["<hr>", "<rule>", "<line>"], correctAnswer: "<hr>" },
+            { question: "Which HTML element defines a caption for a figure element?", options: ["<caption>", "<figcaption>", "<legend>"], correctAnswer: "<figcaption>" },
+            { question: "Which CSS property specifies the type of cursor to be displayed?", options: ["mouse", "cursor", "pointer"], correctAnswer: "cursor" },
+            { question: "What is the HTML tag for a selection list (drop-down list)?", options: ["<list>", "<dropdown>", "<select>"], correctAnswer: "<select>" },
+            { question: "Which HTML attribute specifies a path to a resource?", options: ["url", "path", "src"], correctAnswer: "src" },
+            { question: "Which CSS property is used for positioning elements relative to their normal position?", options: ["position: absolute", "position: relative", "position: fixed"], correctAnswer: "position: relative" },
+            { question: "What is the HTML tag for a head section of a document?", options: ["<body>", "<top>", "<head>"], correctAnswer: "<head>" },
+            { question: "Which HTML element is used to define emphasized text?", options: ["<strong>", "<em>", "<i>"], correctAnswer: "<em>" },
+            { question: "Which CSS property is used to add space outside the border of an element?", options: ["padding", "margin", "spacing"], correctAnswer: "margin" },
+            { question: "What is the HTML tag for an `<h1>` heading?", options: ["<heading1>", "<h1-tag>", "<h1>"], correctAnswer: "<h1>" },
+            { question: "Which HTML attribute specifies a tooltip for an element?", options: ["hint", "title", "data-tip"], correctAnswer: "title" },
+            { question: "Which CSS property defines how an element will be sized and positioned?", options: ["layout", "box-model", "display"], correctAnswer: "display" },
+            { question: "What is the HTML tag for a form element?", options: ["<input>", "<form>", "<fieldset>"], correctAnswer: "<form>" },
+            { question: "Which HTML element defines a section or block of content?", options: ["<span>", "<div>", "<section>"], correctAnswer: "<div>" },
+            { question: "Which CSS property is used to specify the text decoration (e.g., underline)?", options: ["text-style", "text-decoration", "font-decoration"], correctAnswer: "text-decoration" },
+            { question: "What is the HTML tag for a bulleted list?", options: ["<ol>", "<ul>", "<list>"], correctAnswer: "<ul>" },
+            { question: "Which HTML attribute specifies a link to an external resource?", options: ["src", "ref", "href"], correctAnswer: "href" },
+            { question: "Which CSS property is used to set the font weight (e.g., bold)?", options: ["font-style", "font-weight", "text-weight"], correctAnswer: "font-weight" },
+            { question: "What is the HTML tag for an ordered list?", options: ["<unordered-list>", "<ol>", "<li>"], correctAnswer: "<ol>" }
+        ];
+
+        let questions = []; // This will hold our 20 randomly selected questions
+        const QUIZ_SIZE = 20;
+        let currentQuestionIndex = 0;
+        let bricksBuilt = 0;
+        let userAnswers = []; // Array to store all questions and user answers
+        let timer;
+        let timeLeft;
+        const TIME_LIMIT = 40;
+        const colors = ["var(--brick-red)", "var(--brick-blue)", "var(--brick-green)", "var(--brick-yellow)"];
+
+        // DOM elements
+        const quizPanel = document.querySelector('.quiz-panel');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const buildPanel = document.getElementById('build-structure');
+        const scoreDisplay = document.getElementById('score-display');
+        const questionCounter = document.getElementById('question-counter');
+        const scoreSummaryBox = document.getElementById('score-summary');
+        const startButton = document.getElementById('start-button');
+        const messageBox = document.getElementById('message-box');
+        const messageContent = messageBox.querySelector('.message-content');
+        const timerDisplay = document.getElementById('timer-display');
+        let summaryHeadingElement; // To keep track of the summary heading
+        let summaryContainerElement; // To keep track of the summary container
+        let playAgainButtonElement; // To keep track of the play again button
+
+        // Initial setup on page load
+        window.onload = () => {
+            startButton.addEventListener('click', startGame);
+            // Hide timer and score summary box initially
+            timerDisplay.style.display = 'none';
+            scoreSummaryBox.style.display = 'none';
+        };
+
+        // Function to show a custom message box
+        function showMessage(message, nextAction) {
+            messageContent.textContent = message;
+            messageBox.style.display = 'flex';
+            
+            const okButton = messageBox.querySelector('.message-button');
+            okButton.onclick = () => {
+                hideMessage();
+                if (nextAction) {
+                    nextAction();
+                }
+            };
+        }
+
+        // Function to hide the custom message box
+        function hideMessage() {
+            messageBox.style.display = 'none';
+        }
+        
+        // Function to start the game
+        function startGame() {
+            startButton.style.display = 'none';
+            scoreSummaryBox.style.display = 'flex';
+            timerDisplay.style.display = 'block'; // Show timer
+            timerDisplay.classList.remove('low-time'); // Reset timer class
+            
+            // Ensure quiz panel elements are visible/reset
+            questionText.style.display = 'block'; 
+            optionsContainer.style.display = 'flex'; 
+
+            // Remove summary elements if they exist from a previous game
+            if (summaryHeadingElement && summaryHeadingElement.parentNode) {
+                summaryHeadingElement.remove();
+            }
+            if (summaryContainerElement && summaryContainerElement.parentNode) {
+                summaryContainerElement.remove();
+            }
+            if (playAgainButtonElement && playAgainButtonElement.parentNode) {
+                playAgainButtonElement.remove();
+            }
+            
+            questions = [...allQuestions].sort(() => Math.random() - 0.5).slice(0, QUIZ_SIZE);
+            currentQuestionIndex = 0;
+            bricksBuilt = 0;
+            userAnswers = []; // Reset user answers for a new game
+            updateScoreDisplay();
+            buildPanel.innerHTML = ''; // Clear built structure
+            displayQuestion();
+        }
+
+        // Function to display the current question
+        function displayQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                endGame();
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionText.textContent = `Question ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+            optionsContainer.innerHTML = '';
+            
+            updateScoreDisplay();
+
+            // Reset and start timer
+            clearInterval(timer);
+            timeLeft = TIME_LIMIT;
+            timerDisplay.textContent = timeLeft;
+            timerDisplay.classList.remove('low-time');
+            timer = setInterval(countdown, 1000);
+
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-button');
+                button.addEventListener('click', () => checkAnswer(option, button));
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        // Countdown timer function
+        function countdown() {
+            timeLeft--;
+            timerDisplay.textContent = timeLeft;
+
+            if (timeLeft <= 10) {
+                timerDisplay.classList.add('low-time');
+            }
+
+            if (timeLeft === 0) {
+                clearInterval(timer);
+                handleTimeout();
+            }
+        }
+        
+        // Handle timer running out
+        function handleTimeout() {
+            const allButtons = document.querySelectorAll('.option-button');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            // Record the user's non-answer
+            userAnswers.push({
+                question: questions[currentQuestionIndex].question,
+                userAnswer: 'Timeout',
+                correctAnswer: questions[currentQuestionIndex].correctAnswer,
+                isCorrect: false
+            });
+
+            removeBrick();
+            showMessage("Time's up! A brick has been removed.", nextQuestion);
+        }
+
+        // Function to check the user's answer
+        function checkAnswer(selectedOption, button) {
+            clearInterval(timer); // Stop the timer once an answer is chosen
+            const currentQuestion = questions[currentQuestionIndex];
+            const allButtons = document.querySelectorAll('.option-button');
+            
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            const isCorrect = (selectedOption === currentQuestion.correctAnswer);
+            
+            // Record the user's answer
+            userAnswers.push({
+                question: currentQuestion.question,
+                userAnswer: selectedOption,
+                correctAnswer: currentQuestion.correctAnswer,
+                isCorrect: isCorrect
+            });
+            
+            if (isCorrect) {
+                bricksBuilt++;
+                button.classList.add('correct');
+                addBrick();
+                showMessage("Correct! You've added a new piece to your rocket!", nextQuestion);
+            } else {
+                button.classList.add('wrong');
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.correctAnswer) {
+                        btn.classList.add('correct');
+                    }
+                });
+                removeBrick();
+                showMessage(`Incorrect. The correct answer was "${currentQuestion.correctAnswer}". A brick has been removed.`, () => {
+                    allButtons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('correct', 'wrong');
+                    });
+                    nextQuestion();
+                });
+            }
+        }
+        
+        // Function to add a brick to the structure
+        function addBrick() {
+            const brick = document.createElement('div');
+            brick.classList.add('brick');
+            const brickColor = colors[bricksBuilt % colors.length];
+            brick.style.backgroundColor = brickColor;
+            buildPanel.appendChild(brick);
+            
+            // Set the position of the new brick
+            const newBrickPosition = (bricksBuilt - 1) * 50; // 50px is the height of a brick
+            brick.style.bottom = `${newBrickPosition}px`;
+        }
+
+        // Function to remove a brick on a wrong answer or timeout
+        function removeBrick() {
+            if (bricksBuilt > 0) {
+                const lastBrick = buildPanel.querySelector('.brick:last-child');
+                lastBrick.classList.add('falling');
+                bricksBuilt--;
+                
+                setTimeout(() => {
+                    lastBrick.remove();
+                }, 500); // Match falling animation duration
+            }
+        }
+
+        // Function to update the score and question display
+        function updateScoreDisplay() {
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${QUIZ_SIZE}`;
+            scoreDisplay.textContent = `Bricks Built: ${bricksBuilt}`;
+        }
+        
+        // Function to advance to the next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                displayQuestion();
+            } else {
+                endGame();
+            }
+        }
+        
+        // Function to display the end-of-game summary
+        function displaySummary() {
+            // Add a heading for the summary
+            summaryHeadingElement = document.createElement('h2');
+            summaryHeadingElement.textContent = "Quiz Summary";
+            summaryHeadingElement.style.color = 'var(--brick-yellow)';
+            summaryHeadingElement.style.fontFamily = `'Luckiest Guy', cursive`;
+            quizPanel.insertBefore(summaryHeadingElement, questionText.nextSibling); // Insert after question text
+
+            // Create a container for the summary items
+            summaryContainerElement = document.createElement('div');
+            summaryContainerElement.id = 'end-summary';
+            
+            userAnswers.forEach((item, index) => {
+                const summaryItem = document.createElement('div');
+                summaryItem.classList.add('summary-item');
+                
+                const questionPara = document.createElement('p'); // Renamed to avoid conflict
+                questionPara.classList.add('summary-question');
+                questionPara.textContent = `Question ${index + 1}: ${item.question}`;
+                summaryItem.appendChild(questionPara);
+                
+                const userAnswerText = document.createElement('p');
+                userAnswerText.textContent = `Your Answer: ${item.userAnswer}`;
+                
+                const correctAnswerText = document.createElement('p');
+                correctAnswerText.textContent = `Correct Answer: ${item.correctAnswer}`;
+                
+                if (item.isCorrect) {
+                    userAnswerText.classList.add('summary-answer');
+                    correctAnswerText.classList.add('summary-answer');
+                } else {
+                    userAnswerText.classList.add('summary-wrong');
+                    correctAnswerText.classList.add('summary-answer');
+                }
+                
+                summaryItem.appendChild(userAnswerText);
+                summaryItem.appendChild(correctAnswerText);
+                summaryContainerElement.appendChild(summaryItem);
+            });
+            
+            quizPanel.appendChild(summaryContainerElement);
+            
+            playAgainButtonElement = document.createElement('button');
+            playAgainButtonElement.textContent = "Play Again?";
+            playAgainButtonElement.classList.add('message-button');
+            playAgainButtonElement.style.marginTop = '20px';
+            playAgainButtonElement.addEventListener('click', () => {
+                // Remove summary specific elements before starting new game
+                if (summaryHeadingElement && summaryHeadingElement.parentNode) summaryHeadingElement.remove();
+                if (summaryContainerElement && summaryContainerElement.parentNode) summaryContainerElement.remove();
+                if (playAgainButtonElement && playAgainButtonElement.parentNode) playAgainButtonElement.remove();
+                startGame();
+            });
+            quizPanel.appendChild(playAgainButtonElement);
+        }
+
+        // Function to end the game
+        function endGame() {
+            clearInterval(timer);
+            // Hide the options and timer
+            optionsContainer.style.display = 'none'; // Hide the options container
+            timerDisplay.style.display = 'none';
+            
+            // Update the final score in the header
+            scoreSummaryBox.innerHTML = `<span>Final Score: ${bricksBuilt} of ${questions.length}</span>`;
+
+            questionText.textContent = "Mission Complete!";
+            
+            displaySummary(); // This will put the summary content into the quizPanel
+        }
+    </script>
+</body>
+</html>
